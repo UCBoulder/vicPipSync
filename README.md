@@ -4,6 +4,32 @@ vicPipSync is a tool for temporaly syncing DIC data from VIC-SNAP and VIC-3D wit
 
 ## How to get vicPipSync
 
+### For Users Not Familiar with Git
+
+If you are not familiar with Git and just want to download the repository folder to use it as you normally would any other MATLAB code, follow these steps:
+
+1. Go to the [vicPipSync repository](https://github.com/samuelhattonCU/vicPipSync) on GitHub.
+2. Click on the green "Code" button located at the top-right corner of the repository page.
+3. In the dropdown menu, click on "Download ZIP".
+4. Once the ZIP file is downloaded, extract its contents to a folder on your computer.
+5. You can now open and use the MATLAB code in the extracted folder as you normally would.
+
+### For Users Familiar with Git
+
+If you are familiar with Git and prefer to clone the repository yourself, follow these steps:
+
+1. Open your terminal or command prompt.
+2. Navigate to the directory where you want to clone the repository.
+3. Run the following command to clone the repository:
+   ```bash
+   git clone https://github.com/samuelhattonCU/vicPipSync.git
+   ```
+4. Navigate into the cloned repository:
+   ```bash
+   cd vicPipSync
+   ```
+5. You can now open and use the MATLAB code in the cloned repository as you normally would.
+
 # Usage
 
 ## How to Get a PIP Signal in Your Data
