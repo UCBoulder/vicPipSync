@@ -20,14 +20,6 @@
 %
 %
 
-%% Initial setup
-current_dir = pwd;
-
-% Check for temp directory
-if ~exist('vicPipSync_temp', 'dir')
-    mkdir('vicPipSync_temp');
-end
-
 %% Get User Input
 
 % Get locations of data files to be synced:
