@@ -1,9 +1,9 @@
 % vicPipSync.m
 %
-% vicPipSync is a tool for temporaly syncing DIC data from VIC-SNAP and VIC-3D with Instron data. 
+% vicPipSync is a tool for temporaly syncing DIC data from VIC-SNAP and VIC-3D with Instron data.
 % It can sync datasets that contain a PIP signal in both the VIC and Instron data outputs.
 %
-% To sync your data, either run this script in MATLAB or run it from the commandline or 
+% To sync your data, either run this script in MATLAB or run it from the commandline or
 % inside another script using the `run("path/to/this/script/vicPipSync.m")` command
 %
 % For more usage instructions, please visit ######################
@@ -32,6 +32,7 @@ end
 
 % Get locations of data files to be synced:
 target = sample_select;
+
 
 %% Load and Sync Data
 
