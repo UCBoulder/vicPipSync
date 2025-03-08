@@ -17,8 +17,16 @@
 %
 %
 % Dependencies:
+%     sample_select.m
+%     load_data.m
+%     save_data.m
+%     get_vic_snap.m
+%     get_ext_data.m
+%     get_inst_data.m
+%     sync_data.m
 %
-%
+clear; close all; clc;
+addpath("Functions\")
 
 %% Get User Input
 

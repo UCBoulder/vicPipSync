@@ -24,10 +24,17 @@ function target = sample_select
 
     % Check for previous selection:
     if exist('vicPipSync_temp/prev_selection.txt', 'file')
-        prev_sel = fileread('vicPipSync_temp/prev_selection.txt');
-        choice = questdlg(sprintf('Use previous selection?\n\n%s', prev_sel), ...
-            'Previous Selection Found', ...
-            'Use Previous', 'New Selection', 'Use Previous');
+        fid = fopen('vicPipSync_temp/prev_selection.txt', 'r');
+        prev_sel = textscan(fid, '%s', 'Delimiter', '\n');
+        fclose(fid);
+        prev_sel = prev_sel{1};
+        if isempty(prev_sel)
+            choice = 'New Selection';
+        else
+            choice = questdlg(sprintf('Use previous selection?\n\n%s', strjoin(prev_sel, '\n')), ...
+                'Previous Selection Found', ...
+                'Use Previous', 'New Selection', 'Use Previous');
+        end
     else
         choice = 'New Selection';
     end
@@ -43,12 +50,12 @@ function target = sample_select
             'Okay', 'Cancel', 'Okay');
 
             if strcmp(choice, 'Cancel')
-                error('Selection cancelled by user');
+            error('Selection cancelled by user');
             end
 
             [vic_file, vic_path] = uigetfile('*.csv', 'Select VIC-SNAP Output CSV');
             if vic_file == 0
-                error('No file selected');
+            error('No file selected');
             end
 
             % Select VIC-3D Extensometer file
@@ -57,12 +64,12 @@ function target = sample_select
             'Okay', 'Cancel', 'Okay');
 
             if strcmp(choice, 'Cancel')
-                error('Selection cancelled by user');
+            error('Selection cancelled by user');
             end
 
-            [ext_file, ext_path] = uigetfile('*.csv', 'Select Extensometer Output CSV');
+            [ext_file, ext_path] = uigetfile(fullfile(vic_path, '*.csv'), 'Select Extensometer Output CSV');
             if ext_file == 0
-                error('No file selected');
+            error('No file selected');
             end
 
             % Select INSTRON data output file
@@ -71,15 +78,15 @@ function target = sample_select
             'Okay', 'Cancel', 'Okay');
 
             if strcmp(choice, 'Cancel')
-                error('Selection cancelled by user');
+            error('Selection cancelled by user');
             end
 
-            [inst_file, inst_path] = uigetfile('*.csv', 'Select Instron data CSV');
+            [inst_file, inst_path] = uigetfile(fullfile(ext_path, '*.csv'), 'Select Instron data CSV');
             if inst_file == 0
-                error('No file selected');
+            error('No file selected');
             end
 
-            target = [vic_path, ext_path, inst_path];
+            target = {fullfile(vic_path, vic_file), fullfile(ext_path, ext_file), fullfile(inst_path, inst_file)};
         otherwise
             error("Selection cancelled by user.")
     end
@@ -146,7 +153,7 @@ function target = sample_select
             mkdir('vicPipSync_temp');
         end
         fid = fopen('vicPipSync_temp/prev_selection.txt', 'w');
-        fprintf(fid, '%s\n%s\n%s\n', vic_path, ext_path, inst_path);
+        fprintf(fid, '%s\n%s\n%s\n', target{1}, target{2}, target{3});
         fclose(fid);
     end
 end

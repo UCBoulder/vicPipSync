@@ -30,7 +30,22 @@ If you are familiar with Git and prefer to clone the repository yourself, follow
    ```
 5. You can now open and use the MATLAB code in the cloned repository as you normally would.
 
-# Usage
+# Give It a Try with Sample Data
+([Or jump to the detailed usage instructions below](#detailed-usage-instructions))
+
+To get a quick feel for how vicPipSync works, you can try syncing up the data in the `Sample Data` folder. Go ahead and run the `vicPipSync` script in MATLAB, and see if you can follow the process. The GUI will prompt you for specific files, and the data in the sample folder is labeled to match. This data is a little messy, so you will need to help the sync function find the PIP signal in the VIC-SNAP data when it prompts you. You can play around with different voltage threshold values to see what works; Remember, the PIP signal is idealy a 5V spike in the data.
+
+You can plot the synced sample data by running the `example_plots.m` script in the `Sample Data` folder. It should produce the plots below (my apologies if you're viewing this in dark mode).
+
+Obviously, the displacements do not match at all! That's the primary driver for using the exetensometer derived displacement values instead of the measured crosshead displacement from the Instron. The two values usually don't match because of things like compliance in the load string or an improperly zeroed displacement reading on the Instron.
+
+It's also useful to notice that the force vs. time data doesn't look that different zoomed out, but when you look closely, you can see that the "synced" data stream has the sampling frequency of the VIC data, which is much less than the Instron data. Generally, your VIC data needs to be more coarse than your Instron data for the syncing to work well.
+
+![Sample Force-Displacement Plot](Sample%20Data/sample_plot_fd.png)
+
+![Sample Force-Time Plot](Sample%20Data/sample_plot_ft.png)
+
+# Detailed Usage Instructions
 
 ## How to Get a PIP Signal in Your Data
 
@@ -38,8 +53,27 @@ If you are familiar with Git and prefer to clone the repository yourself, follow
 
 ## How to Sync Your Data
 
+### Using a Graphical User Interface (GUI)
+1. Ensure you have the VIC-SNAP, VIC-3D, and Instron data files you want to sync.
+2. Run the `vicPipSync` script in MATLAB.
+   - You can run the script using the Run button, or by typing `vicPipSync` in the MATLAB command window.
+   - You can run the script from another piece of MATLAB code using the `run` function.
+3. Follow the prompts to select your data files.
+   - Select the VIC-SNAP, VIC-3D, and Instron data files using the interactive dialog.
+   - You can also load previous selections if available.
+   - The script will usually just fail if you select the wrong files, so you can try again if needed.
+4. The script will load and synchronize the data.
+   - You may need to help the script locate the PIP signal in the VIC-SNAP data if it cannot find it automatically. The script will prompt you to do this if necessary.
+5. Choose the file formats you want to save the synchronized data in.
+   - You can select from .mat, .csv, and .txt formats.
+6. The script will save the synchronized data in the selected formats.
+7. You can now use the synchronized data for further analysis.
+
+### Syncing Data Without the GUI
+If you want to skip the interactive dialogs, you can use the `load_data` function directly with the file paths as input arguments. Take a look at the header comments in the `load_data` function for more information on how to use it.
+
 # Contributions
-If you would like to submit a bug fix or feature addition, please open an issue, make a pull request, or email samuel.hatton@colorado.edu.
+You can help find bugs by opening an issue and including some steps to follow to make the bug show up. If you would like to submit a bug fix or feature addition, please open an issue, make a pull request, or email samuel.hatton@colorado.edu.
 
 # Code Overview
 
