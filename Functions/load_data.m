@@ -6,22 +6,27 @@ function synced_force_disp = load_data(target)
     % Samuel Hatton
     %
     % Inputs
-    %     target        List containing the paths to the VIC-SNAP, VIC-3D, 
+    %     target        List containing the paths to the VIC-SNAP, VIC-3D,
     %                   and Instron output files to be synced. Format:
     %                   `target = [vic_path, ext_path, inst_path];`
     % Outputs
     %     synced_force_disp     table containing synced data
-
+    %
     % Methodology
     %     1. Loads VIC-SNAP, VIC-3D Extensometer, and Instron data specified in target
     %     2. Interpolates over empty indexes in extensometer data
     %     3. Syncs data using `sync_data` function
     %     4. Outputs saved data
+    % Dependencies
+    %     get_vic_snap.m
+    %     get_ext_data.m
+    %     get_inst_data.m
+    %     sync_data.m
 
     % Load in data files:
-    vic_snap  = get_vic_snap(target(1));
-    ext_data  = get_ext_data(target(2));
-    inst_data = get_inst_data(target(3));
+    vic_snap  = get_vic_snap(target{1});
+    ext_data  = get_ext_data(target{2});
+    inst_data = get_inst_data(target{3});
 
     % Check for and interpolate over empty extensometer indexes
     tf = isnan(ext_data.("ΔL"));
@@ -63,5 +68,5 @@ function synced_force_disp = load_data(target)
         synced_force_disp = inst_data;
     end
 
-    
+
 end
