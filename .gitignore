@@ -5,3 +5,5 @@ temp/
 *.txt
 *.png
 *.jpg
+
+!'Sample Data/*.csv'
