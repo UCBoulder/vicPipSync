@@ -1,6 +1,6 @@
 # vicPipSync
 
-vicPipSync is a tool for temporaly syncing DIC data from VIC-SNAP and VIC-3D with Instron data. It can sync datasets that contain a PIP signal in both the VIC and Instron data outputs.
+vicPipSync is a MATLAB code package for temporaly syncing DIC data from VIC-SNAP and VIC-3D with Instron force-displacement data. It can sync datasets that contain a PIP signal in both the VIC and Instron data outputs.
 ---
 # Getting Started
 
@@ -39,7 +39,7 @@ To get a quick feel for how vicPipSync works, you can try syncing up the data in
 
 You can plot the synced sample data by running the `example_plots.m` script in the `Sample Data` folder. It should produce the plots below (my apologies if you're viewing this in dark mode).
 
-Obviously, the displacements do not match at all! That's the primary driver for using the exetensometer derived displacement values instead of the measured crosshead displacement from the Instron. The two values usually don't match because of things like compliance in the load string or an improperly zeroed displacement reading on the Instron.
+Obviously, the displacements do not match at all! That's the primary driver for using the DIC exetensometer derived displacement values instead of the measured crosshead displacement from the Instron. The two values usually don't match because of things like compliance in the load string or an improperly zeroed displacement reading on the Instron.
 
 It's also useful to notice that the force vs. time data doesn't look that different zoomed out, but when you look closely, you can see that the "synced" data stream has the sampling frequency of the VIC data, which is much less than the Instron data. Generally, your VIC data needs to be more coarse than your Instron data for the syncing to work well.
 
@@ -75,7 +75,7 @@ These instructions are fairly specific to the test setup in the Lopez Jimenez la
    - If you push through the resistance to a point that feels stable, you've gone to far; back the plug out a little bit. 
    - The PIP port is on the left side of the Instron, near where the force transducers plug in (See reference images below).
 5. Test the connection by pressing the button on the PIP cable. Each time the button is pressed, there should be a voltage jump in the VIC-Snap anaolg data window and the Instron PIP count should increment by one.
-6. During any test where the Instron and VIC-Snap are both taking data, press the PIP button to add a temporal marker in both data sets. This is the marker that is used by the tool in post-processing to sync up the two data sets.
+6. Procede with your test procedure as normal from here. Simply press the pip button at any time during the test; as long as both the Instron and VIC-Snap are capturing data, the signal will be captured by both systems.
 
 #### Reference Images:
 ##### PIP Cable: Instron end with audio jack and PIP button
