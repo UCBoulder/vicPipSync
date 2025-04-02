@@ -6,4 +6,5 @@ temp/
 *.png
 *.jpg
 
-!'Sample Data/*.csv'
+# !Sample Data/
+!Sample Data/*.csv
