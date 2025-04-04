@@ -124,5 +124,5 @@ function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf)
     % synced_force_disp = table(ext_data.Index,ext_data.(targ_var),inst_data.Force,vic_snap.Time,'VariableNames',{'Index',targ_var_name,'Force','Time'});
     % synced_force_disp = table(ext_data.Index,vic_snap.Time,inst_data.Force,ext_data(:,2:end),'VariableNames',[{'Index','Time','Force'},ext_data.Properties.VariableNames(2:end)]);
     synced_force_disp = join(table(ext_data.Index,vic_snap.Time,inst_data.Force,'VariableNames',{'Index','Time','Force'}),ext_data,"Keys","Index");
-    fprintf("Data synced successfully")
+    fprintf("Data synced successfully\n")
 end

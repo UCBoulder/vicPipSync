@@ -1,4 +1,4 @@
-function synced_force_disp = load_data(target)
+function synced_force_disp = load_data(target,verb)
     % load_data.m
     %
     % Francisco Lopez Jimenez Lab, AMReC
@@ -9,6 +9,8 @@ function synced_force_disp = load_data(target)
     %     target        List containing the paths to the VIC-SNAP, VIC-3D,
     %                   and Instron output files to be synced. Format:
     %                   `target = [vic_path, ext_path, inst_path];`
+    %     verb          optional, if == "verbose", plots and stuff get
+    %                   output
     % Outputs
     %     synced_force_disp     table containing synced data
     %
@@ -22,8 +24,13 @@ function synced_force_disp = load_data(target)
     %     get_inst_data.m
     %     sync_data.m
 
+    % check for verb:
+    if ~exist("verb","var")
+        verb = [];
+    end
+
     % Load in data files:
-    vic_snap  = get_vic_snap(target{1});
+    vic_snap  = get_vic_snap(target{1},verb);
     ext_data  = get_ext_data(target{2});
     inst_data = get_inst_data(target{3});
 
