@@ -1,4 +1,4 @@
-function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf,targ_var,targ_var_name)
+function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf)
     % sync_data.m
     %
     % Francisco Lopez Jimenez Lab, AMReC
@@ -10,20 +10,17 @@ function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf,targ_
     %     ext_data      - Table containing extensometer data with fields 'Index' and target variable (e.g., 'ΔL')
     %     inst_data     - Table containing Instron data with fields 'PIPCount', 'Time', and 'Force'
     %     trim_tf       - Boolean flag to trim data outside the Instron test period (default: true)
-    %     targ_var      - Name of the target variable in ext_data (default: "ΔL")
-    %     targ_var_name - Name of the target variable for output table (default: 'Displacement')
     %
     % Outputs
     %     synced_force_disp - Table containing synchronized data with fields 'Index', target variable, 'Force', and 'Time'
     %
     % Methodology
-    %     1. Ensure trim_tf, targ_var, and targ_var_name have default values if not provided.
-    %     2. Convert targ_var_name to char array if it is a string.
-    %     3. Truncate vic_snap or ext_data to ensure they have the same length.
-    %     4. Identify match points using PIPCount and adjust vic_snap time to match inst_data time.
-    %     5. Trim vic_snap and ext_data based on trim_tf flag.
-    %     6. Create truncated instron data that matches 1-to-1 with ext_data.
-    %     7. Combine synchronized data into a new table.
+    %     1. Ensure trim_tf, has default value if not provided.
+    %     2. Truncate vic_snap or ext_data to ensure they have the same length.
+    %     3. Identify match points using PIPCount and adjust vic_snap time to match inst_data time.
+    %     4. Trim vic_snap and ext_data based on trim_tf flag.
+    %     5. Create truncated instron data that matches 1-to-1 with ext_data.
+    %     6. Combine synchronized data into a new table.
     %
     % Dependencies
     %     None
@@ -37,20 +34,6 @@ function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf,targ_
         % taken in the few seconds before the Instron test started.
         % Similarly, vic-based data after the end of the Instron data
         % is discarded as well.
-    end
-
-    if ~exist("targ_var","var")
-        targ_var = "ΔL";
-        % Default behavior gets and outputs delta L from extensometer
-    end
-    if ~exist("targ_var_name","var")
-        targ_var_name = 'Displacement';
-        % Default behavior gets and outputs delta L from extensometer
-    end
-
-    % Enforce that targ_var_name input is a char array not a string.
-    if isa(targ_var_name,'string')
-        targ_var_name = char(targ_var_name);
     end
 
     % Enforce that vic and ext datas be the same length:
@@ -92,8 +75,8 @@ function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf,targ_
         % zero out vic time:
         vic_snap.Time = vic_snap.Time - vic_snap.Time(1);
 
-        % zero out displacement data
-        ext_data.(targ_var) = ext_data.(targ_var) - ext_data.(targ_var)(1);
+        % % zero out displacement data
+        % ext_data.(targ_var) = ext_data.(targ_var) - ext_data.(targ_var)(1);
     end
 
     % create truncated instron data that matches 1to1 w/ ext. data
@@ -138,6 +121,8 @@ function synced_force_disp = sync_data(vic_snap,ext_data,inst_data,trim_tf,targ_
     end
 
     % combine into a new table
-    synced_force_disp = table(ext_data.Index,ext_data.(targ_var),inst_data.Force,vic_snap.Time,'VariableNames',{'Index',targ_var_name,'Force','Time'});
-
+    % synced_force_disp = table(ext_data.Index,ext_data.(targ_var),inst_data.Force,vic_snap.Time,'VariableNames',{'Index',targ_var_name,'Force','Time'});
+    % synced_force_disp = table(ext_data.Index,vic_snap.Time,inst_data.Force,ext_data(:,2:end),'VariableNames',[{'Index','Time','Force'},ext_data.Properties.VariableNames(2:end)]);
+    synced_force_disp = join(table(ext_data.Index,vic_snap.Time,inst_data.Force,'VariableNames',{'Index','Time','Force'}),ext_data,"Keys","Index");
+    fprintf("Data synced successfully")
 end

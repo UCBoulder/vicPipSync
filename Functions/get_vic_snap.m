@@ -41,6 +41,7 @@ function vic_snap = get_vic_snap(file_path)
         vic_snap = [data(:,"Count"),data(:,"Time_0_1"),data(:,"PIP")];
     else
         warning("No PIP signal found in '" + file_name + "', skipping")
+        fprintf("VIC-Snap file FAILED to load successfully\n")
         vic_snap = [];
         return
     end
@@ -86,4 +87,5 @@ function vic_snap = get_vic_snap(file_path)
 
     % Output final data table
     vic_snap.PIPCount = PIPCount;
+    fprintf("VIC-Snap file loaded successfully\n")
 end
