@@ -14,13 +14,12 @@ function inst_data = get_inst_data(file_path)
     % Methodology
     %     1. Loads data from file path
     %     2. Outputs loaded data
-    %
-    % NOTE: Funtions assumes a file format! If header lines are different, this needs to be changed!
 
-    % % Load data without formatting warnings:
-    % warning off
-    % % inst_data = readtable(file_path,"NumHeaderLines",8,"VariableNamesLine",7,"VariableUnitsLine",8);
-    % warning on
+    %{
+        The following code was primarily written by Claude 3.7 Sonnet
+        Normal in Extended Thinking mode from the claude.ai website on 4 
+        April 2025. 
+    %}
 
     % Determine the file format and load the data accordingly
     fid = fopen(file_path, 'r');
