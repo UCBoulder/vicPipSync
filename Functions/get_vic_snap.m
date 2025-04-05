@@ -29,6 +29,10 @@ function vic_snap = get_vic_snap(file_path,verb)
     % Dependencies:
     %     None
 
+    if nargin ~= 2
+        verb = "No";
+    end
+
     % Load Data, Supress file format warnings
     warning off
     data = readtable(file_path, "NumHeaderLines", 1,"VariableNamesLine",1);
