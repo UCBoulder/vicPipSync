@@ -6,7 +6,7 @@
 % To sync your data, either run this script in MATLAB or run it from the commandline or
 % inside another script using the `run("path/to/this/script/vicPipSync.m")` command
 %
-% For more usage instructions, please visit ######################
+% For more usage instructions, please visit https://github.com/samuelhattonCU/vicPipSync
 %
 % Samuel Hatton
 % Francisco Lopez Jimenez Lab
