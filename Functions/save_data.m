@@ -34,12 +34,13 @@ function save_data(synced_force_disp)
     % fileTypes = struct('mat', '.mat', 'csv', '.csv', 'txt', '.txt');
     
     % Create format selection dialog
+    warning off
     [formats, ok] = listdlg('ListString', {'MATLAB (.mat)', 'CSV (.csv)', 'Text (.txt)'}, ...
         'SelectionMode', 'multiple', ...
         'Name', 'Select File Formats', ...
         'PromptString', 'Select formats to save:', ...
         'ListSize', [200 100]);
-    
+    warning on
     if ~ok || isempty(formats)
         return;  % User cancelled or made no selection
     end

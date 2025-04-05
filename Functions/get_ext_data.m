@@ -21,7 +21,9 @@ function ext_data = get_ext_data(file_path)
 
 
     % Load Data:
+    warning off
     ext_data = readtable(file_path,'NumHeaderLines',2,"VariableNamesLine",2,"VariableUnitsLine",1);
+    warning on
 
     % Format variable names, assuming one of two output formats:
 
@@ -29,7 +31,9 @@ function ext_data = get_ext_data(file_path)
     
     % Check for multiple extensometer outputs
     if sz(2) ~= 5 && sz(2) ~=2 % indicates more than one extensometer output
+        warning off
         choice = questdlg("Load more than one extensometer?","Multiple E's Detected","No","Yes","No");
+        warning on
         % find start indices of each output extensometer
         r1 = string(ext_data.Properties.VariableUnits);
         n = 0;

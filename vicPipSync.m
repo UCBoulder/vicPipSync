@@ -36,7 +36,7 @@ target = sample_select;
 
 %% Load and Sync Data
 
-synced_force_disp = load_data(target);
+synced_force_disp = load_data(target,"verbose");
 
 %% Output Synced Data
 

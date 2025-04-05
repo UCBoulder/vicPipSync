@@ -18,13 +18,13 @@ function vic_snap = get_vic_snap(file_path,verb)
     %
     % Methodology:
     %     1. Reads in file as a table.
-    %     2. Remoes calibration image entries.
+    %     2. Removes calibration image entries.
     %     3. Extracts relevent data columns.
     %     4. Locates index of PIP signals
-    %         - Uses a default voltage threshold and asks user for help
-    %           if that doesn't work at first.
+    %         - Uses a grouping algorithm to find the earlist of the most 
+    %           prominent peaks or troughs.
     %     5. Outputs loaded data.
-    %         - Outputs empty array if no valid file is found.
+    %         - errors if non "PIP" signal exists in the input file.
     %        
     % Dependencies:
     %     None
@@ -32,7 +32,7 @@ function vic_snap = get_vic_snap(file_path,verb)
     % Load Data, Supress file format warnings
     warning off
     data = readtable(file_path, "NumHeaderLines", 1,"VariableNamesLine",1);
-    warning off
+    warning on
 
     % Trim out calibration images
     bad_rows = contains(data.Filename_0_1,"-cal-");
@@ -42,10 +42,11 @@ function vic_snap = get_vic_snap(file_path,verb)
     if any("PIP" == string(data.Properties.VariableNames))
         vic_snap = [data(:,"Count"),data(:,"Time_0_1"),data(:,"PIP")];
     else
-        warning("No PIP signal found in '" + file_name + "', skipping")
-        fprintf("VIC-Snap file FAILED to load successfully\n")
-        vic_snap = [];
-        return
+        % warning("No PIP signal found in '" + file_name + "', skipping")
+        % fprintf("VIC-Snap file FAILED to load successfully\n")
+        % vic_snap = [];
+        % return
+        error("VIC-Snap file FAILED to load successfully: No PIP signal found in '" + file_name)
     end
 
     % Determine if signal is normally 5v or 0v:
@@ -59,131 +60,240 @@ function vic_snap = get_vic_snap(file_path,verb)
     switch gate
         case "low open"
             fprintf("Searching for voltage spike from 0V to 5V\n")
-            % Set thresholds
-            start_threshold = 4.8;
-            close_threshold = 0.1;
-            
-            % find first threshold breach
-            spike_start = find(vic_snap.PIP > start_threshold,1);
-            
-            % while isempty(spike_start)
-            %     fprintf("No spike found with voltage threshold %.2f V, trying again.\n",start_threshold)
-            %     start_threshold = start_threshold - 0.02;
-            %     if start_threshold <= close_threshold
-            %         error("No PIP signal found in " + file_path)
-            %     end
-            %     spike_start = find(vic_snap.PIP > start_threshold,1);
-            % end
-            % fprintf("Found signal spike above %.2f V\n", start_threshold);
 
-            if isempty(spike_start)
-                fprintf("No spike found with voltage threshold %f V, trying again.\n",start_threshold)
-                [maxV,max_idx] = max(vic_snap.PIP);
-                if maxV > close_threshold + 0.01
-                    spike_start = max_idx;
+            % Find largest values, one of which is our desired pip point
+            [maxs,mIdx] = maxk(vic_snap.PIP,10);
+
+            % use a prominence value to find the 1st grouping of values:
+            c = 1;
+            for i = 2:10
+                if maxs(i-1) - maxs(i) < 0.004
+                    c = c + 1;
                 else
-                    figure
-                    plot(vic_snap.PIP)
-                    hold on
-                    yline(close_threshold + 0.01,'--')
-                    grid on
-                    legend("Signal","Threshold")
-                    xlabel("Index")
-                    ylabel("Voltage")
-                    title("PIP Signal for " + file_path)
-                    a = gca;
-                    a.YLim = [a.YLim(1),close_threshold+0.015];
-
-                    error("No PIP signal outside of the smallest threshold! Please see generated figure for reference.")
+                    break
                 end
-                fprintf("Used maximum point (%.2f V) as PIP point\n", maxV);
+            end
+            
+            % trim, keeping only the first group:
+            mIdx = mIdx(1:c);
+
+            % Pick the earliest of the first group:
+            [~,earliestIdx] = min(mIdx);
+            pip_loc = mIdx(earliestIdx);
+            
+            pip_voltage = vic_snap.PIP(pip_loc);
+
+            if pip_voltage > 4.8
+                warning("The deteceted PIP signal has a very small prominance, please double check that there is a discernible spike in the signal. Try using the 'verbose' key in your load_data call.")
+            end
+
+            if strcmp("verbose",verb)
                 figure
                 plot(vic_snap.PIP)
                 hold on
-                scatter(spike_start,vic_snap.PIP(spike_start),'xr')
+                scatter(pip_loc,vic_snap.PIP(pip_loc),'xr')
                 grid on
                 legend("Signal","Detected Spike")
                 xlabel("Index")
                 ylabel("Voltage")
                 title("PIP Signal for " + file_path)
-            else
-                fprintf("Found signal spike above %.2f V\n", start_threshold);
-                if strcmp("verbose",verb)
-                    figure
-                    plot(vic_snap.PIP)
-                    hold on
-                    scatter(spike_start,vic_snap.PIP(spike_start),'xr')
-                    grid on
-                    legend("Signal","Detected Spike")
-                    xlabel("Index")
-                    ylabel("Voltage")
-                    title("PIP Signal for " + file_path)
-                end
             end
+
+            % % Set thresholds
+            % start_threshold = 4.8;
+            % close_threshold = 0.1;
+            % 
+            % % find first threshold breach
+            % spike_start = find(vic_snap.PIP > start_threshold,1);
+            % 
+            % % while isempty(spike_start)
+            % %     fprintf("No spike found with voltage threshold %.2f V, trying again.\n",start_threshold)
+            % %     start_threshold = start_threshold - 0.02;
+            % %     if start_threshold <= close_threshold
+            % %         error("No PIP signal found in " + file_path)
+            % %     end
+            % %     spike_start = find(vic_snap.PIP > start_threshold,1);
+            % % end
+            % % fprintf("Found signal spike above %.2f V\n", start_threshold);
+            % 
+            % if isempty(spike_start)
+            %     fprintf("No spike found with voltage threshold %f V, trying again.\n",start_threshold)
+            %     [maxV,max_idx] = max(vic_snap.PIP);
+            %     if maxV > close_threshold + 0.01
+            %         spike_start = max_idx;
+            %     else
+            %         figure
+            %         plot(vic_snap.PIP)
+            %         hold on
+            %         yline(close_threshold + 0.01,'--')
+            %         grid on
+            %         legend("Signal","Threshold")
+            %         xlabel("Index")
+            %         ylabel("Voltage")
+            %         title("PIP Signal for " + file_path)
+            %         a = gca;
+            %         a.YLim = [a.YLim(1),close_threshold+0.015];
+            % 
+            %         error("No PIP signal outside of the smallest threshold! Please see generated figure for reference.")
+            %     end
+            %     fprintf("Used maximum point (%.2f V) as PIP point\n", maxV);
+            %     figure
+            %     plot(vic_snap.PIP)
+            %     hold on
+            %     scatter(spike_start,vic_snap.PIP(spike_start),'xr')
+            %     grid on
+            %     legend("Signal","Detected Spike")
+            %     xlabel("Index")
+            %     ylabel("Voltage")
+            %     title("PIP Signal for " + file_path)
+            % else
+            %     fprintf("Found signal spike above %.2f V\n", start_threshold);
+            %     if strcmp("verbose",verb)
+            %         figure
+            %         plot(vic_snap.PIP)
+            %         hold on
+            %         scatter(spike_start,vic_snap.PIP(spike_start),'xr')
+            %         grid on
+            %         legend("Signal","Detected Spike")
+            %         xlabel("Index")
+            %         ylabel("Voltage")
+            %         title("PIP Signal for " + file_path)
+            %     end
+            % end
             
                     
         case "high open"
             fprintf("Searching for voltage dip from 5V to 0V\n")
             % set thresholds
-            start_threshold = 0.1;
-            close_threshold = 4.9;
+            % start_threshold = 0.1;
+            % close_threshold = 4.9;
 
-            % find first threshold breach
-            spike_start = find(vic_snap.PIP < start_threshold);
+            % Find lowest values, one of which is our desired pip point
+            [mins,mIdx] = mink(vic_snap.PIP,10);
 
-            % while isempty(spike_start)
-            %     fprintf("No dip found with voltage threshold %f V, trying again.\n",start_threshold)
-            %     start_threshold = start_threshold + 0.02;
-            %     if start_threshold >= close_threshold
-            %         error("No PIP signal found in " + file_path)
-            %     end
-            %     spike_start = find(vic_snap.PIP < start_threshold,1);
-            % end
-            
-            if isempty(spike_start)
-                fprintf("No dip found with voltage threshold %f V, trying again.\n",start_threshold)
-                [minV,min_idx] = min(vic_snap.PIP);
-                if minV < close_threshold - 0.01
-                    spike_start = min_idx;
+            % use a prominence value to find the 1st grouping of values:
+            c = 1;
+            for i = 2:10
+                if mins(i) - mins(i-1) < 0.004
+                    c = c + 1;
                 else
-                    figure
-                    plot(vic_snap.PIP)
-                    hold on
-                    yline(close_threshold- 0.01,'--')
-                    grid on
-                    legend("Signal","Threshold")
-                    xlabel("Index")
-                    ylabel("Voltage")
-                    title("PIP Signal for " + file_path)
-                    a = gca;
-                    a.YLim = [close_threshold-0.015,a.YLim(2)];
-
-                    error("No PIP signal outside of the smallest threshold! Please see generated figure for reference.")
+                    break
                 end
-                fprintf("Used minimum point (%.2f V) as PIP point\n", minV);
+            end
+            
+            % trim, keeping only the first group:
+            mIdx = mIdx(1:c);
+
+            % Pick the earliest of the first group:
+            [~,earliestIdx] = min(mIdx);
+            pip_loc = mIdx(earliestIdx);
+            
+            pip_voltage = vic_snap.PIP(pip_loc);
+
+            if pip_voltage > 4.8
+                warning("The deteceted PIP signal has a very small prominance, please double check that there is a discernible spike in the signal. Try using the 'verbose' key in your load_data call.")
+            end
+
+            if strcmp("verbose",verb)
                 figure
                 plot(vic_snap.PIP)
                 hold on
-                scatter(spike_start,vic_snap.PIP(spike_start),'xr')
+                scatter(pip_loc,vic_snap.PIP(pip_loc),'xr')
                 grid on
                 legend("Signal","Detected Dip")
                 xlabel("Index")
                 ylabel("Voltage")
                 title("PIP Signal for " + file_path)
-            else
-                fprintf("Found signal dip below %.2f V\n", start_threshold);
-                if strcmp("verbose",verb)
-                    figure
-                    plot(vic_snap.PIP)
-                    hold on
-                    scatter(spike_start,vic_snap.PIP(spike_start),'xr')
-                    grid on
-                    legend("Signal","Detected Dip")
-                    xlabel("Index")
-                    ylabel("Voltage")
-                    title("PIP Signal for " + file_path)
-                end
             end
+
+            % pip_loc = vic_snap.PIP(mIdx);
+                
+
+            % % group values by their magnitude using a prominance
+
+            % currentGroup = 1;
+            % groups = ones(10,1);
+            % 
+            % for i = 2:10
+            %     % If current values is significantly larger than the
+            %     % previous, start a new group:
+            %     if mins(i) - mins(i-1) > 0.004
+            %         currentGroup = currentGroup + 1;
+            %     end
+            %     groups(i) = currentGroup;
+            % end
+            % 
+            % % For each group, find the earliest occurence:
+            % candIdx = zeros(currentGroup,1);
+            % candMin = zeros(currentGroup,1);
+            % 
+            % for i = 1:currentGroup
+            %     members = mIdx(groups == i);
+            %     [~,earliestIdx] = min(members);
+            %     candIdx(i) = members(earliestIdx);
+            %     candMin(i) = vic_snap.PIP(candIdx(i));
+            % end
+            % 
+            % % choose the earliest value from the smallest group
+
+
+
+            % % find first threshold breach
+            % spike_start = find(vic_snap.PIP < start_threshold);
+            % 
+            % % while isempty(spike_start)
+            % %     fprintf("No dip found with voltage threshold %f V, trying again.\n",start_threshold)
+            % %     start_threshold = start_threshold + 0.02;
+            % %     if start_threshold >= close_threshold
+            % %         error("No PIP signal found in " + file_path)
+            % %     end
+            % %     spike_start = find(vic_snap.PIP < start_threshold,1);
+            % % end
+            % 
+            % if isempty(spike_start)
+            %     fprintf("No dip found with voltage threshold %f V, trying again.\n",start_threshold)
+            %     [minV,min_idx] = min(vic_snap.PIP);
+            %     if minV < close_threshold - 0.01
+            %         spike_start = min_idx;
+            %     else
+            %         figure
+            %         plot(vic_snap.PIP)
+            %         hold on
+            %         yline(close_threshold- 0.01,'--')
+            %         grid on
+            %         legend("Signal","Threshold")
+            %         xlabel("Index")
+            %         ylabel("Voltage")
+            %         title("PIP Signal for " + file_path)
+            %         a = gca;
+            %         a.YLim = [close_threshold-0.015,a.YLim(2)];
+            % 
+            %         error("No PIP signal outside of the smallest threshold! Please see generated figure for reference.")
+            %     end
+            %     fprintf("Used minimum point (%.2f V) as PIP point\n", minV);
+            %     figure
+            %     plot(vic_snap.PIP)
+            %     hold on
+            %     scatter(spike_start,vic_snap.PIP(spike_start),'xr')
+            %     grid on
+            %     legend("Signal","Detected Dip")
+            %     xlabel("Index")
+            %     ylabel("Voltage")
+            %     title("PIP Signal for " + file_path)
+            % else
+            %     fprintf("Found signal dip below %.2f V\n", start_threshold);
+            %     if strcmp("verbose",verb)
+            %         figure
+            %         plot(vic_snap.PIP)
+            %         hold on
+            %         scatter(spike_start,vic_snap.PIP(spike_start),'xr')
+            %         grid on
+            %         legend("Signal","Detected Dip")
+            %         xlabel("Index")
+            %         ylabel("Voltage")
+            %         title("PIP Signal for " + file_path)
+            %     end
+            % end
             
     end
 
@@ -196,7 +306,7 @@ function vic_snap = get_vic_snap(file_path,verb)
     %     pip_loc = idxs(1);
     % end
     
-    pip_loc = spike_start;
+    % pip_loc = spike_start;
 
     % Generate PIP Count vector in format of Instron PIP output
     PIPCount = zeros(length(vic_snap.Count),1);
