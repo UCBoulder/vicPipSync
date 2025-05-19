@@ -43,7 +43,7 @@ grid minor
 figure
 hold on
 plot(inst_data.Displacement, inst_data.Force, "DisplayName", "Instron Data");
-plot(synced_force_disp.Displacement,synced_force_disp.Force,"DisplayName","Synced Data");
+plot(synced_force_disp.("ΔL"),synced_force_disp.Force,"DisplayName","Synced Data");
 
 legend("Location","best");
 
