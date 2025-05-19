@@ -73,6 +73,7 @@ These instructions are fairly specific to the test setup in the Lopez Jimenez la
    - Save the method file and open it as a test; a PIP counter should now appear in the live display.
 2. Ensure the BNC end of the PIP cable is plugged into the `AI 0` port of the DIC-connected DAQ (See reference images below).
 3. Open the `Analog Data` window in VIC-Snap.
+    - You can configure the data window to only show the "AI 0" data stream, and rename the stream to `PIP` if it isn't already.
 4. Lightly insert the audio jack end of the PIP cable into the Instron PIP port, just until you feel some resistance (you can pretty much just drop it in). 
    - If you push through the resistance to a point that feels stable, you've gone to far; back the plug out a little bit. 
    - The PIP port is on the left side of the Instron, near where the force transducers plug in (See reference images below).
