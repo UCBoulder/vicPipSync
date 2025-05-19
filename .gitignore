@@ -8,3 +8,5 @@ temp/
 
 # !Sample Data/
 !Sample Data/*.csv
+!Sample Data/*.png
+!Documentation/Reference Images/*.jpg
