@@ -26,7 +26,7 @@
 %     sync_data.m
 %
 clear; close all; clc;
-addpath("Functions\")
+addpath("Functions")
 
 %% Get User Input
 
