@@ -2,6 +2,8 @@
 
 vicPipSync is a MATLAB package for syncing DIC data from VIC-SNAP and VIC-3D with Instron force-displacement data using a shared PIP signal.
 
+Originally forked from [samuelhattonCU/vicPipSync](https://github.com/samuelhattonCU/vicPipSync).
+
 ---
 
 # Getting Started
@@ -11,7 +13,7 @@ Go to [Documentation](Documentation/) for more detailed guides.
 ## Download
 
 **Option 1: Download ZIP File**
-1. Go to the [vicPipSync GitHub page](https://github.com/samuelhattonCU/vicPipSync).
+1. Go to the [vicPipSync GitHub page](https://github.com/UCBoulder/vicPipSync).
 2. Click "Code" > "Download ZIP".
 3. Extract the ZIP and open the folder in MATLAB.
 
